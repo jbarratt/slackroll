@@ -1,15 +1,31 @@
+# -*- coding: utf-8 -*-
 import json
 from urlparse import parse_qs
-import random
+import dice
+
+
+def unidice(roll):
+    faces = [u'⚀', u'⚁', u'⚂', u'⚃', u'⚄', u'⚅']
+    return u' + '.join(faces[x-1] for x in roll)
 
 
 def parse_roll(command):
-    val = random.choice(range(1, 7))
     if command is None:
-        return "I rolled one 6 sided dice, and you got: {}".format(val)
-    else:
-        return ("You asked me to '{}' but I'm too dumb."
-                "I rolled you a 6 sided dice and it came up {}").format(command, val)
+        command = 'd6'
+    elif command.strip().lower() == 'help':
+        return "`/roll <number>d<sides>`, e.g. `3d20` = 3 20 sided dice."
+
+    try:
+        roll = dice.roll(command)
+    except:
+        return "I'm sorry, I couldn't parse '{}'".format(command)
+
+    if isinstance(roll, int):
+        return "{} = {}".format(command, roll)
+    if roll.sides <= 6:
+        return u"{} = {}".format(unidice(roll), sum(roll))
+
+    return " + ".join(str(x) for x in roll) + " = {}".format(sum(roll))
 
 
 def handler(event, context):

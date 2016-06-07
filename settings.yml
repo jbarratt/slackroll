@@ -1,0 +1,24 @@
+---
+project: slackroll
+default-region: us-west-2
+code-bucket: gordon-slackroll-bcf935bd
+apps:
+  - gordon.contrib.lambdas
+  - rollbot
+
+contexts:
+  default:
+    token: ref://Token
+
+apigateway:
+  slackrollapi:
+    description: "Slack Dice Bot API"
+    resources:
+      /rollbot-webhook:
+        methods: POST
+        integration:
+          lambda: rollbot.rollbot
+        request_templates:
+          application/x-www-form-urlencoded: |
+              {"body": $input.json("$")}
+
